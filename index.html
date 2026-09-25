@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Felipa&amp;family=Fira+Mono:wght@400;700&amp;family=Fira+Sans:wght@200;300;400&amp;family=Lora:wght@400&amp;family=Grandiflora+One&amp;family=Francois+One&amp;display=swap" rel="stylesheet">
 <style>
   html, .gl-search::placeholder { color: rgb(152,152,152); opacity: 1; }
+  html, body { overflow-x: hidden; max-width: 100%; overscroll-behavior-x: none; }
   body { margin: 0; padding: 0; background: #fff; }
   * { box-sizing: border-box; }
   a { color: inherit; text-decoration: none; }
@@ -22,7 +23,9 @@
   @media (max-width: 700px) {
     .gl-desk { display: none !important; }
     .gl-body { gap: 0 !important; }
+    .gl-scroll { overflow-x: hidden !important; touch-action: pan-y; margin-left: 0 !important; padding-left: 0 !important; }
     .gl-books { grid-template-columns: minmax(0,1fr) !important; }
+    .gl-authors { grid-template-columns: minmax(0,1fr) !important; }
     .gl-hdr { padding-left: 0 !important; padding-right: 0 !important; }
     .gl-logo { flex: 1 0 100%; font-size: calc((100vw - 24px) / 7.8) !important; line-height: 1.15 !important; padding-bottom: 0.08em; white-space: nowrap; }
     .gl-hdr > div { flex: 1 0 100%; justify-content: flex-end; }
@@ -43,7 +46,7 @@
     <div style="position:relative; display:flex; flex-direction:row; gap:20px; align-items:center; flex-shrink:0;">
       <div style="position:relative; width:250px; max-width:44vw; height:22px; display:flex; flex-direction:row; align-items:center; gap:8px;">
         <input ref="{{ searchRef }}" type="text" placeholder="buscar" value="{{ query }}" onChange="{{ onQuery }}" onBlur="{{ onSearchBlur }}" class="gl-search" style="flex:1; min-width:0; height:20px; border:none; border-radius:0; background:transparent; outline:none; padding:0; text-align:left; font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-size:12px; line-height:100%; color:{{ ink }}; text-transform:lowercase; transition:opacity 260ms ease 180ms; opacity:{{ searchOpacity }}; pointer-events:{{ searchPE }};">
-        <span onMouseDown="{{ keepFocus }}" onClick="{{ onSearchToggle }}" title="buscar" style="flex-shrink:0; width:20px; height:20px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:{{ ink }};" style-hover="opacity:0.6">
+        <span onMouseDown="{{ keepFocus }}" onClick="{{ onSearchToggle }}" title="buscar" style="flex-shrink:0; width:20px; height:20px; display:flex; align-items:center; justify-content:flex-end; cursor:pointer; color:{{ ink }};" style-hover="opacity:0.6">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="5.8" cy="5.8" r="4.6"></circle><line x1="9.2" y1="9.2" x2="13.2" y2="13.2"></line></svg>
         </span>
         <div style="position:absolute; left:0; right:0; bottom:-2px; height:1px; background:{{ ink }}; transform-origin:right center; transition:transform 460ms cubic-bezier(.2,.7,.2,1); transform:{{ searchLine }};"></div>
@@ -69,6 +72,9 @@
 
     <div ref="{{ listRef }}" onScroll="{{ onScroll }}" class="gl-scroll" style="position:relative; flex:1 1 0; min-width:0; width:auto; padding-left:0.4em; margin-left:-0.4em; font-size:{{ termSize }}; box-sizing:content-box; flex-shrink:1; overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none; scroll-behavior:auto; overflow-anchor:none; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;">
       <div style="height:38vh; flex-shrink:0;"></div>
+      <sc-if value="{{ noIndex }}" hint-placeholder-val="{{ false }}">
+        <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(16px,1.3vw,18px); line-height:150%; color:{{ mid }};">Nada...</span>
+      </sc-if>
       <sc-for list="{{ terms }}" as="t" hint-placeholder-count="6">
         <div data-term="1" style="position:relative; display:flex; flex-direction:column; gap:6px; align-items:flex-start; padding:{{ itemPad }};">
           <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-start; align-self:stretch; z-index:3; top:0; background:transparent; position:{{ t.headPos }}; padding:{{ t.headPad }};">
@@ -80,13 +86,13 @@
               </sc-for>
             </div>
             <div style="display:flex; flex-direction:row; gap:24px; align-items:flex-start; align-self:stretch; justify-content:space-between;">
-              <div data-mq="1" style="flex:1; min-width:0; overflow:hidden; padding:0.1em 0.3em 0.28em 0.3em; margin:-0.1em -0.3em 0 -0.3em; font-family:{{ termFont }}; font-size:{{ termSize }}; line-height:{{ termLh }};">
-                <span data-mq-in="1" onClick="{{ t.onToggle }}" style="display:inline-block; font-weight:400; line-height:1.25; padding-bottom:0; white-space:nowrap; cursor:pointer; transition:color 420ms ease; will-change:transform; color:{{ t.color }};">{{ t.name }}</span>
+              <div data-mq="1" style="flex:1; min-width:0; overflow:hidden; padding:0.1em 0.3em 0.22em 0.3em; margin:-0.1em -0.3em -0.2em -0.3em; font-family:{{ termFont }}; font-size:{{ termSize }}; line-height:{{ termLh }};">
+                <span data-mq-in="1" onClick="{{ t.onToggle }}" style="display:inline-block; font-weight:400; line-height:1; padding-bottom:0; white-space:nowrap; cursor:pointer; transition:color 420ms ease; will-change:transform; color:{{ t.color }};">{{ t.name }}</span>
               </div>
             </div>
           </div>
           <sc-if value="{{ t.open }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex; flex-direction:column; gap:18px; padding:14px 0 6px 0; max-width:575px;">
+            <div style="display:flex; flex-direction:column; gap:18px; padding:4px 0 6px 0; max-width:575px;">
               <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(16px,1.5vw,20px); line-height:127.72%; color:{{ ink }};">{{ t.definition }}</span>
               <sc-if value="{{ t.hasMore }}" hint-placeholder-val="{{ false }}">
                 <span onClick="{{ t.onMore }}" style="cursor:pointer; align-self:flex-start; font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:12px; line-height:100%; text-transform:lowercase; color:{{ ink }}; border-bottom:1px solid {{ ink }}; padding-bottom:3px;" style-hover="color:{{ mid }}; border-color:{{ mid }}">leer más ↓</span>
@@ -94,26 +100,6 @@
               <sc-if value="{{ t.expanded }}" hint-placeholder-val="{{ false }}">
                 <div style="display:flex; flex-direction:column; gap:18px; border-top:1px solid {{ line }}; padding-top:20px;">
                   <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:200; font-size:clamp(15px,1.35vw,18px); line-height:150%; color:{{ ink }};">{{ t.extended }}</span>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:23px; padding:12px 0 6px 0;">
-                    <figure style="margin:0; display:flex; flex-direction:column; gap:10px;">
-                      <div style="position:relative; width:100%; aspect-ratio:3/4; box-shadow:inset 0 0 0 1px {{ line }};">
-                        <image-slot id="proc-fig-01" shape="rect" fit="cover" src="https://images.unsplash.com/photo-1583521214690-73421a1829a9?auto=format&amp;fit=crop&amp;w=900&amp;q=80" credit="Photo by Wesley Tingey on Unsplash" credit-href="https://unsplash.com/@wesleyphotography" placeholder="expediente en su orden original"></image-slot>
-                      </div>
-                      <figcaption style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:160%; color:{{ mid }};">fig. 01 — Fondo municipal conservado en el orden que le dio su productor, antes de cualquier intervención.</figcaption>
-                    </figure>
-                    <figure style="margin:0; display:flex; flex-direction:column; gap:10px;">
-                      <div style="position:relative; width:100%; aspect-ratio:3/4; box-shadow:inset 0 0 0 1px {{ line }};">
-                        <image-slot id="proc-fig-02" shape="rect" fit="cover" src="https://images.unsplash.com/photo-1569235186275-626cb53b83ce?auto=format&amp;fit=crop&amp;w=900&amp;q=80" credit="Photo by Maksym Kaharlytskyi on Unsplash" credit-href="https://unsplash.com/@qwitka" placeholder="fichero de consulta"></image-slot>
-                      </div>
-                      <figcaption style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:160%; color:{{ mid }};">fig. 02 — Fichero de consulta: la descripción media el acceso sin romper la cadena de custodia.</figcaption>
-                    </figure>
-                    <figure style="margin:0; display:flex; flex-direction:column; gap:10px;">
-                      <div style="position:relative; width:100%; aspect-ratio:3/4; box-shadow:inset 0 0 0 1px {{ line }};">
-                        <image-slot id="proc-fig-03" shape="rect" fit="cover" src="https://images.unsplash.com/photo-1526656001029-20a71b17f7ba?auto=format&amp;fit=crop&amp;w=900&amp;q=80" credit="Photo by Sear Greyson on Unsplash" credit-href="https://unsplash.com/@seargreyson" placeholder="dos fondos mezclados"></image-slot>
-                      </div>
-                      <figcaption style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:160%; color:{{ mid }};">fig. 03 — Legajos de distintos productores en un mismo estante: la procedencia rota deja de explicar el documento.</figcaption>
-                    </figure>
-                  </div>
                   <sc-if value="{{ t.hasRelated }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex; flex-direction:column; gap:8px;">
                       <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:100%; text-transform:lowercase; color:{{ faint }};">{{ t.campo }}</span>
@@ -137,36 +123,13 @@
                 <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-style:italic; font-size:clamp(15px,1.25vw,17px); line-height:150%; color:{{ ink }}; text-wrap:pretty;">Un documento separado de quien lo produjo sigue existiendo, pero deja de poder explicar por qué existe.</span>
                 <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:100%; color:{{ mid }};">— sobre el respeto de los fondos</span>
               </blockquote>
-              <p style="margin:0; font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(16px,1.3vw,18px); line-height:160%; color:{{ ink }}; text-wrap:pretty;"><span style="float:left; font-family:{{ termFont }}; font-size:4.2em; line-height:0.8; padding:0.08em 0.08em 0 0; color:{{ ink }};">L</span>a <em>procedencia</em> es la regla que mantiene juntos los documentos de un mismo productor. Antes de preguntar qué dice un papel, el archivo pregunta <strong style="font-weight:500;">quién lo produjo</strong>, para qué y en relación con qué otros papeles.</p>
+              <p style="margin:0; font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(16px,1.3vw,18px); line-height:160%; color:{{ ink }}; text-wrap:pretty;">La <em>procedencia</em> es la regla que mantiene juntos los documentos de un mismo productor. Antes de preguntar qué dice un papel, el archivo pregunta <strong style="font-weight:500;">quién lo produjo</strong>, para qué y en relación con qué otros papeles.</p>
             <p style="margin:0; font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(16px,1.3vw,18px); line-height:160%; color:{{ ink }}; text-wrap:pretty;">El principio se formula en Francia en 1841, cuando una circular del Ministerio del Interior —redactada por <strong style="font-weight:500;">Natalis de Wailly</strong>— ordena reunir los documentos por fondos: todo lo que proviene de un mismo organismo debe mantenerse junto. Es el <em>respect des fonds</em>.</p>
             <p style="margin:0; font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(16px,1.3vw,18px); line-height:160%; color:{{ ink }}; text-wrap:pretty;">En 1881 los archivos estatales de Prusia lo refuerzan como <em>Provenienzprinzip</em> y le suman el <strong style="font-weight:500;">orden original</strong>: dentro del fondo se conserva la disposición que le dio su productor. En 1898 el manual de <strong style="font-weight:500;">Muller, Feith y Fruin</strong> lo convierte en norma de la disciplina.</p>
             <p style="margin:0; font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(16px,1.3vw,18px); line-height:160%; color:{{ ink }}; text-wrap:pretty;">Respetar la procedencia significa no reordenar por tema, fecha o formato documentos que nacieron juntos. El fondo es la unidad; romper esa relación <strong style="font-weight:500;">borra la evidencia</strong> de cómo y por qué existió cada documento.</p>
             <p style="margin:0; font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(16px,1.3vw,18px); line-height:160%; color:{{ ink }}; text-wrap:pretty;">Desde los años sesenta, el sistema de series de <strong style="font-weight:500;">Peter Scott</strong> en Australia y, más tarde, la archivística postcustodial de <strong style="font-weight:500;">Terry Cook</strong> discuten la idea de un único productor: los documentos digitales y las instituciones cambiantes tienen <em>procedencias múltiples</em>, compartidas o sucesivas.</p>
-              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:20px; padding-top:18px;">
-              <figure style="margin:0; display:flex; flex-direction:column; gap:10px;">
-                <div style="position:relative; width:100%; aspect-ratio:3/4; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-fig-01" shape="rect" fit="cover" src="https://images.unsplash.com/photo-1583521214690-73421a1829a9?auto=format&amp;fit=crop&amp;w=900&amp;q=80" credit="Photo by Wesley Tingey on Unsplash" credit-href="https://unsplash.com/@wesleyphotography" placeholder="expediente en su orden original"></image-slot>
-                </div>
-                <figcaption style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:160%; color:{{ mid }};">fig. 01 — Fondo municipal conservado en el orden que le dio su productor.</figcaption>
-              </figure>
-              <figure style="margin:0; display:flex; flex-direction:column; gap:10px;">
-                <div style="position:relative; width:100%; aspect-ratio:3/4; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-fig-02" shape="rect" fit="cover" src="https://images.unsplash.com/photo-1569235186275-626cb53b83ce?auto=format&amp;fit=crop&amp;w=900&amp;q=80" credit="Photo by Maksym Kaharlytskyi on Unsplash" credit-href="https://unsplash.com/@qwitka" placeholder="fichero de consulta"></image-slot>
-                </div>
-                <figcaption style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:160%; color:{{ mid }};">fig. 02 — Fichero de consulta: la descripción media el acceso.</figcaption>
-              </figure>
-              <figure style="margin:0; display:flex; flex-direction:column; gap:10px;">
-                <div style="position:relative; width:100%; aspect-ratio:3/4; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-fig-03" shape="rect" fit="cover" src="https://images.unsplash.com/photo-1526656001029-20a71b17f7ba?auto=format&amp;fit=crop&amp;w=900&amp;q=80" credit="Photo by Sear Greyson on Unsplash" credit-href="https://unsplash.com/@seargreyson" placeholder="dos fondos mezclados"></image-slot>
-                </div>
-                <figcaption style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:160%; color:{{ mid }};">fig. 03 — Legajos de distintos productores: la procedencia rota deja de explicar.</figcaption>
-              </figure>
-              </div>
                   </div>
                   <div class="gl-art-side" style="position:sticky; top:clamp(120px,14vh,180px); min-width:0; max-width:380px; display:flex; flex-direction:column; gap:28px;">
-                    <div style="position:relative; width:100%; aspect-ratio:3/4; box-shadow:inset 0 0 0 1px {{ line }};">
-                      <image-slot id="proc-hero" shape="rect" fit="cover" src="https://images.unsplash.com/photo-1583521214690-73421a1829a9?auto=format&amp;fit=crop&amp;w=1200&amp;q=80" credit="Photo by Wesley Tingey on Unsplash" credit-href="https://unsplash.com/@wesleyphotography" placeholder="imagen principal: un fondo en su orden original"></image-slot>
-                    </div>
               <div style="display:flex; flex-direction:column; gap:2px;">
                 <span style="font-family:{{ termFont }}; font-size:20px; line-height:115%; color:{{ ink }};">otros principios</span>
                 <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:18px; line-height:120%; color:{{ ink }};">del archivo</span>
@@ -181,38 +144,79 @@
                 
         <div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:24px clamp(24px,4vw,64px); align-items:flex-start;">
           <div style="flex:0 0 180px; display:flex; flex-direction:column; gap:2px;">
-            <span style="font-family:{{ termFont }}; font-size:clamp(22px,2vw,26px); line-height:110%; color:{{ ink }};">libros</span>
+            <span style="font-family:{{ termFont }}; font-size:clamp(22px,2vw,26px); line-height:110%; color:{{ ink }};">archivos</span>
             <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(18px,1.6vw,21px); line-height:120%; color:{{ ink }};">destacados</span>
           </div>
           <div class="gl-books" style="flex:1 1 420px; min-width:0; display:grid; gap:32px clamp(14px,2vw,28px); grid-template-columns:repeat(3, minmax(0,1fr));">
-              <div style="display:flex; flex-direction:column; gap:14px; min-width:0;">
-                <div style="position:relative; width:100%; aspect-ratio:2/3; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-b1" shape="rect" fit="cover" placeholder="tapa del libro"></image-slot>
-                </div>
+              <div style="display:flex; flex-direction:column; gap:14px; min-width:0; padding-top:14px; border-top:1px solid {{ line }};">
                 <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(20px,1.8vw,26px); line-height:115%; color:{{ ink }}; text-wrap:pretty;">Handleiding voor het ordenen en beschrijven van archieven</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">S. Muller, J. A. Feith y R. Fruin</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Países Bajos, 1898</span>
+                  <span style="font-family:{{ termFont }}; font-size:clamp(20px,1.8vw,26px); line-height:115%; color:{{ ink }}; text-wrap:pretty;"><a href="https://www.argentina.gob.ar/interior/archivo-general-de-la-nacion" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Archivo General de la Nación ↗</a></span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Buenos Aires, Argentina</span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">desde 1821</span>
                 </div>
               </div>
-              <div style="display:flex; flex-direction:column; gap:14px; min-width:0;">
-                <div style="position:relative; width:100%; aspect-ratio:2/3; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-b2" shape="rect" fit="cover" placeholder="tapa del libro"></image-slot>
-                </div>
+              <div style="display:flex; flex-direction:column; gap:14px; min-width:0; padding-top:14px; border-top:1px solid {{ line }};">
                 <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(20px,1.8vw,26px); line-height:115%; color:{{ ink }}; text-wrap:pretty;">A Manual of Archive Administration</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Hilary Jenkinson</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Reino Unido, 1922</span>
+                  <span style="font-family:{{ termFont }}; font-size:clamp(20px,1.8vw,26px); line-height:115%; color:{{ ink }}; text-wrap:pretty;"><a href="https://www.archives-nationales.culture.gouv.fr/" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Archives nationales ↗</a></span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">París, Francia</span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">desde 1790 · cuna del respect des fonds</span>
                 </div>
               </div>
-              <div style="display:flex; flex-direction:column; gap:14px; min-width:0;">
-                <div style="position:relative; width:100%; aspect-ratio:2/3; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-b3" shape="rect" fit="cover" placeholder="tapa del libro"></image-slot>
-                </div>
+              <div style="display:flex; flex-direction:column; gap:14px; min-width:0; padding-top:14px; border-top:1px solid {{ line }};">
                 <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(20px,1.8vw,26px); line-height:115%; color:{{ ink }}; text-wrap:pretty;">Modern Archives: Principles and Techniques</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Theodore R. Schellenberg</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Estados Unidos, 1956</span>
+                  <span style="font-family:{{ termFont }}; font-size:clamp(20px,1.8vw,26px); line-height:115%; color:{{ ink }}; text-wrap:pretty;"><a href="https://gsta.preussischer-kulturbesitz.de/" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Geheimes Staatsarchiv ↗</a></span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Berlín, Alemania</span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Provenienzprinzip, 1881</span>
+                </div>
+              </div>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:24px clamp(24px,4vw,64px); align-items:flex-start;">
+          <div style="flex:0 0 180px; display:flex; flex-direction:column; gap:2px;">
+            <span style="font-family:{{ termFont }}; font-size:clamp(22px,2vw,26px); line-height:110%; color:{{ ink }};">archivos</span>
+            <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(18px,1.6vw,21px); line-height:120%; color:{{ ink }};">relacionados</span>
+          </div>
+          <div style="flex:1 1 420px; min-width:0; display:grid; gap:22px 28px; grid-template-columns:repeat(auto-fill, minmax(min(100%,260px), 1fr));">
+              <div style="display:flex; flex-direction:row; gap:14px; align-items:flex-start; min-width:0; padding-top:12px; border-top:1px solid {{ line }};">
+                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;"><a href="https://www.nationaalarchief.nl/" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Nationaal Archief ↗</a></span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">La Haya, Países Bajos</span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">desde 1802</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:row; gap:14px; align-items:flex-start; min-width:0; padding-top:12px; border-top:1px solid {{ line }};">
+                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;"><a href="https://www.nationalarchives.gov.uk/" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">The National Archives ↗</a></span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Kew, Reino Unido</span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">desde 1838</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:row; gap:14px; align-items:flex-start; min-width:0; padding-top:12px; border-top:1px solid {{ line }};">
+                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;"><a href="https://www.cultura.gob.es/cultura/areas/archivos/mc/archivos/agi/portada.html" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Archivo General de Indias ↗</a></span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Sevilla, España</span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">desde 1785</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:row; gap:14px; align-items:flex-start; min-width:0; padding-top:12px; border-top:1px solid {{ line }};">
+                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;"><a href="https://es.wikipedia.org/w/index.php?search=Archivo%20Hist%C3%B3rico%20de%20la%20Provincia%20de%20Buenos%20Aires%20Ricardo%20Levene" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Archivo Histórico de la Provincia de Buenos Aires ↗</a></span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">La Plata, Argentina</span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">desde 1925</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:row; gap:14px; align-items:flex-start; min-width:0; padding-top:12px; border-top:1px solid {{ line }};">
+                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;"><a href="https://www.argentina.gob.ar/derechoshumanos/anm" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Archivo Nacional de la Memoria ↗</a></span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Buenos Aires, Argentina</span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">desde 2003</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:row; gap:14px; align-items:flex-start; min-width:0; padding-top:12px; border-top:1px solid {{ line }};">
+                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;"><a href="https://memoriaabierta.org.ar/" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Memoria Abierta ↗</a></span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Buenos Aires, Argentina</span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">desde 2000</span>
                 </div>
               </div>
           </div>
@@ -220,67 +224,35 @@
         <div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:24px clamp(24px,4vw,64px); align-items:flex-start;">
           <div style="flex:0 0 180px; display:flex; flex-direction:column; gap:2px;">
             <span style="font-family:{{ termFont }}; font-size:clamp(22px,2vw,26px); line-height:110%; color:{{ ink }};">libros</span>
-            <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(18px,1.6vw,21px); line-height:120%; color:{{ ink }};">relacionados</span>
+            <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(18px,1.6vw,21px); line-height:120%; color:{{ ink }};">en español</span>
           </div>
           <div style="flex:1 1 420px; min-width:0; display:grid; gap:22px 28px; grid-template-columns:repeat(auto-fill, minmax(min(100%,260px), 1fr));">
-              <div style="display:flex; flex-direction:row; gap:14px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:64px; height:96px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-b4" shape="rect" fit="cover" placeholder="tapa"></image-slot>
-                </div>
+              <div style="display:flex; flex-direction:row; gap:14px; align-items:flex-start; min-width:0; padding-top:12px; border-top:1px solid {{ line }};">
                 <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;">Le respect des fonds en archivistique</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Michel Duchein</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Francia, 1977</span>
-                </div>
-              </div>
-              <div style="display:flex; flex-direction:row; gap:14px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:64px; height:96px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-b5" shape="rect" fit="cover" placeholder="tapa"></image-slot>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;">Archivística general: teoría y práctica</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Antonia Heredia Herrera</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">España, 1986</span>
-                </div>
-              </div>
-              <div style="display:flex; flex-direction:row; gap:14px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:64px; height:96px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-b6" shape="rect" fit="cover" placeholder="tapa"></image-slot>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;">The Concept of the Archival Fonds</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Terry Cook</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Canadá, 1993</span>
-                </div>
-              </div>
-              <div style="display:flex; flex-direction:row; gap:14px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:64px; height:96px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-b7" shape="rect" fit="cover" placeholder="tapa"></image-slot>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;">Mal de archivo</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Jacques Derrida</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Francia, 1995</span>
-                </div>
-              </div>
-              <div style="display:flex; flex-direction:row; gap:14px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:64px; height:96px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-b8" shape="rect" fit="cover" placeholder="tapa"></image-slot>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;">Along the Archival Grain</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Ann Laura Stoler</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Estados Unidos, 2009</span>
-                </div>
-              </div>
-              <div style="display:flex; flex-direction:row; gap:14px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:64px; height:96px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-b9" shape="rect" fit="cover" placeholder="tapa"></image-slot>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;">Archivística: estudio básico</span>
+                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;"><a href="https://archive.org/search?query=%22Manual%20de%20archivolog%C3%ADa%20hispanoamericana%22" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Manual de archivología hispanoamericana ↗</a></span>
                   <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Aurelio Tanodi</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Argentina, 1961</span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Córdoba, 1961</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:row; gap:14px; align-items:flex-start; min-width:0; padding-top:12px; border-top:1px solid {{ line }};">
+                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;"><a href="https://archive.org/search?query=%22Archiv%C3%ADstica%20general%3A%20teor%C3%ADa%20y%20pr%C3%A1ctica%22" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Archivística general: teoría y práctica ↗</a></span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Antonia Heredia Herrera</span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Sevilla, 1986</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:row; gap:14px; align-items:flex-start; min-width:0; padding-top:12px; border-top:1px solid {{ line }};">
+                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;"><a href="https://archive.org/search?query=%22Manual%20de%20archiv%C3%ADstica%22" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Manual de archivística ↗</a></span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">José Ramón Cruz Mundet</span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Madrid, 1994</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:row; gap:14px; align-items:flex-start; min-width:0; padding-top:12px; border-top:1px solid {{ line }};">
+                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }}; text-wrap:pretty;"><a href="https://archive.org/search?query=%22Diplom%C3%A1tica%3A%20nuevos%20usos%20para%20una%20antigua%20ciencia%22" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Diplomática: nuevos usos para una antigua ciencia ↗</a></span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ ink }};">Luciana Duranti</span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Carmona, 1996 · trad.</span>
                 </div>
               </div>
           </div>
@@ -288,79 +260,47 @@
         <div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:24px clamp(24px,4vw,64px); align-items:flex-start;">
           <div style="flex:0 0 180px; display:flex; flex-direction:column; gap:2px;">
             <span style="font-family:{{ termFont }}; font-size:clamp(22px,2vw,26px); line-height:110%; color:{{ ink }};">autores</span>
-            <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(18px,1.6vw,21px); line-height:120%; color:{{ ink }};">representativos</span>
+            <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(18px,1.6vw,21px); line-height:120%; color:{{ ink }};">destacados</span>
           </div>
-          <div style="flex:1 1 420px; min-width:0; display:grid; gap:22px 28px; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));">
-              <div style="display:flex; flex-direction:row; gap:12px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:60px; height:60px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-p1" shape="rect" fit="cover" placeholder="retrato"></image-slot>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:5px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }};">Natalis de Wailly</span>
+          <div class="gl-authors" style="flex:1 1 420px; min-width:0; display:grid; gap:32px clamp(14px,2vw,28px); grid-template-columns:repeat(2, minmax(0,1fr));">
+              <div style="display:flex; flex-direction:column; gap:14px; min-width:0; padding-top:14px; border-top:1px solid {{ line }};">
+                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                  <span style="font-family:{{ termFont }}; font-size:clamp(22px,2vw,28px); line-height:115%; color:{{ ink }};"><a href="https://es.wikipedia.org/w/index.php?search=Natalis%20de%20Wailly" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Natalis de Wailly ↗</a></span>
                   <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Francia, 1805–1886</span>
+                  <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:15px; line-height:145%; color:{{ ink }}; text-wrap:pretty;">Redacta la circular de 1841 que formula el respeto de los fondos.</span>
                 </div>
               </div>
-              <div style="display:flex; flex-direction:row; gap:12px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:60px; height:60px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-p2" shape="rect" fit="cover" placeholder="retrato"></image-slot>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:5px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }};">Max Lehmann</span>
+              <div style="display:flex; flex-direction:column; gap:14px; min-width:0; padding-top:14px; border-top:1px solid {{ line }};">
+                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                  <span style="font-family:{{ termFont }}; font-size:clamp(22px,2vw,28px); line-height:115%; color:{{ ink }};"><a href="https://es.wikipedia.org/w/index.php?search=Max%20Lehmann" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Max Lehmann ↗</a></span>
                   <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Alemania, 1845–1929</span>
+                  <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:15px; line-height:145%; color:{{ ink }}; text-wrap:pretty;">Impulsa el reglamento prusiano de 1881 que fija el principio de procedencia.</span>
                 </div>
               </div>
-              <div style="display:flex; flex-direction:row; gap:12px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:60px; height:60px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-p3" shape="rect" fit="cover" placeholder="retrato"></image-slot>
-                </div>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:24px clamp(24px,4vw,64px); align-items:flex-start;">
+          <div style="flex:0 0 180px; display:flex; flex-direction:column; gap:2px;">
+            <span style="font-family:{{ termFont }}; font-size:clamp(22px,2vw,26px); line-height:110%; color:{{ ink }};">autores</span>
+            <span style="font-family:'Fira Sans', -apple-system, Helvetica, sans-serif; font-weight:300; font-size:clamp(18px,1.6vw,21px); line-height:120%; color:{{ ink }};">relacionados</span>
+          </div>
+          <div style="flex:1 1 420px; min-width:0; display:grid; gap:22px 28px; grid-template-columns:repeat(auto-fill, minmax(min(100%,200px), 1fr));">
+              <div style="display:flex; flex-direction:row; gap:12px; align-items:flex-start; min-width:0; padding-top:12px; border-top:1px solid {{ line }};">
                 <div style="display:flex; flex-direction:column; gap:5px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }};">Samuel Muller</span>
+                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }};"><a href="https://es.wikipedia.org/w/index.php?search=Samuel%20Muller" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Samuel Muller ↗</a></span>
                   <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Países Bajos, 1848–1922</span>
                 </div>
               </div>
-              <div style="display:flex; flex-direction:row; gap:12px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:60px; height:60px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-p4" shape="rect" fit="cover" placeholder="retrato"></image-slot>
-                </div>
+              <div style="display:flex; flex-direction:row; gap:12px; align-items:flex-start; min-width:0; padding-top:12px; border-top:1px solid {{ line }};">
                 <div style="display:flex; flex-direction:column; gap:5px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }};">Hilary Jenkinson</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Reino Unido, 1882–1961</span>
-                </div>
-              </div>
-              <div style="display:flex; flex-direction:row; gap:12px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:60px; height:60px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-p5" shape="rect" fit="cover" placeholder="retrato"></image-slot>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:5px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }};">Theodore R. Schellenberg</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Estados Unidos, 1903–1970</span>
-                </div>
-              </div>
-              <div style="display:flex; flex-direction:row; gap:12px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:60px; height:60px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-p6" shape="rect" fit="cover" placeholder="retrato"></image-slot>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:5px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }};">Peter J. Scott</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Australia</span>
-                </div>
-              </div>
-              <div style="display:flex; flex-direction:row; gap:12px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:60px; height:60px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-p7" shape="rect" fit="cover" placeholder="retrato"></image-slot>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:5px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }};">Terry Cook</span>
+                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }};"><a href="https://es.wikipedia.org/w/index.php?search=Terry%20Cook" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Terry Cook ↗</a></span>
                   <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Canadá, 1947–2014</span>
                 </div>
               </div>
-              <div style="display:flex; flex-direction:row; gap:12px; align-items:center; min-width:0;">
-                <div style="position:relative; flex-shrink:0; width:60px; height:60px; box-shadow:inset 0 0 0 1px {{ line }};">
-                  <image-slot id="proc-p8" shape="rect" fit="cover" placeholder="retrato"></image-slot>
-                </div>
+              <div style="display:flex; flex-direction:row; gap:12px; align-items:flex-start; min-width:0; padding-top:12px; border-top:1px solid {{ line }};">
                 <div style="display:flex; flex-direction:column; gap:5px; min-width:0;">
-                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }};">Antonia Heredia Herrera</span>
-                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">España</span>
+                  <span style="font-family:{{ termFont }}; font-size:clamp(18px,1.5vw,21px); line-height:115%; color:{{ ink }};"><a href="https://es.wikipedia.org/w/index.php?search=Aurelio%20Tanodi" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:0.18em; text-decoration-color:{{ line }};" style-hover="text-decoration-color:{{ ink }}">Aurelio Tanodi ↗</a></span>
+                  <span style="font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:11px; line-height:130%; color:{{ mid }};">Argentina, 1914–2011</span>
                 </div>
               </div>
           </div>
@@ -377,7 +317,7 @@
 
     <div style="position:absolute; inset:0; pointer-events:none; background:{{ fade }};"></div>
 
-    <div onMouseLeave="{{ onIndexLeave }}" class="gl-desk" style="position:relative; z-index:4; flex-shrink:0; box-sizing:border-box; margin-bottom:clamp(44px,5vw,64px); transition:opacity 420ms ease; opacity:{{ sideO }}; pointer-events:{{ sidePE }}; width:auto; min-width:150px; max-width:240px; margin-right:-10px; padding-right:0; display:flex; flex-direction:column; justify-content:space-between; align-items:flex-end; gap:0; overflow-y:auto; scrollbar-width:none;">
+    <div onMouseLeave="{{ onIndexLeave }}" class="gl-desk" style="position:relative; z-index:4; flex-shrink:0; box-sizing:border-box; margin-bottom:{{ idxMb }}; transition:opacity 420ms ease, margin 520ms cubic-bezier(.2,.7,.2,1); opacity:{{ sideO }}; pointer-events:{{ sidePE }}; width:auto; min-width:150px; max-width:240px; margin-right:0; padding-right:0; display:flex; flex-direction:column; justify-content:space-between; align-items:flex-end; gap:0; overflow-y:auto; scrollbar-width:none;">
       <sc-for list="{{ index }}" as="x" hint-placeholder-count="12">
         <span onClick="{{ x.onClick }}" onMouseEnter="{{ x.onEnter }}" style="cursor:pointer; font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:12px; line-height:100%; padding:3px 0; text-align:right; white-space:nowrap; transition:color 200ms ease, transform 200ms ease; color:{{ x.color }}; transform:{{ x.shift }};">{{ x.name }}</span>
       </sc-for>
@@ -386,7 +326,7 @@
       </sc-if>
     </div>
   </div>
-  <div onClick="{{ onTop }}" title="volver al principio" style="position:fixed; right:clamp(20px,3.5vw,50px); bottom:clamp(12px,1.6vw,20px); z-index:40; display:flex; align-items:center; justify-content:center; width:36px; height:36px; padding:0; cursor:pointer; background:{{ paper }}; box-shadow:inset 0 0 0 1px {{ ink }}; color:{{ ink }}; font-family:'Fira Mono', ui-monospace, Menlo, monospace; font-weight:400; font-size:12px; line-height:100%; text-transform:lowercase; transition:opacity 320ms ease, transform 320ms cubic-bezier(.2,.7,.2,1); opacity:{{ topO }}; transform:{{ topT }}; pointer-events:{{ topPE }};" style-hover="background:{{ ink }}; color:{{ paper }}">
+  <div onClick="{{ onTop }}" title="volver al principio" style="position: fixed; right: {{ rootPadX }}; bottom: clamp(12px,1.6vw,20px); z-index: 40; display: flex; align-items: center; justify-content: flex-end; width: 36px; height: 36px; padding: 0; cursor: pointer; background: {{ paper }}; color: {{ ink }}; font-family: 'Fira Mono', ui-monospace, Menlo, monospace; font-weight: 400; font-size: 12px; line-height: 100%; text-transform: lowercase; transition: opacity 320ms ease, transform 320ms cubic-bezier(.2,.7,.2,1); opacity: {{ topO }}; transform: {{ topT }}; pointer-events: {{ topPE }}" style-hover="background:{{ ink }}; color:{{ paper }}">
     <svg width="10" height="12" viewBox="0 0 10 12" fill="none" stroke="currentColor" stroke-width="1.2"><line x1="5" y1="11.5" x2="5" y2="1"></line><polyline points="1,5 5,1 9,5"></polyline></svg>
   </div>
 </div>
@@ -726,11 +666,19 @@ class Component extends DCLogic {
     if (best !== this.state.active) this.setState({ active: best });
   };
 
-  toggleF(key, v) {
+  toggleF(key, v, from) {
+    const cur = this.visible()[this.state.active];
+    const anchor = from || (cur && cur.name);
     this.setState((st) => {
       const a = st[key].includes(v) ? st[key].filter((x) => x !== v) : [...st[key], v];
-      return { [key]: a, active: 0, more: null };
-    }, () => this.center(0, "auto"));
+      return { [key]: a, more: null };
+    }, () => {
+      const list = this.visible();
+      let j = list.findIndex((x) => x.name === anchor);
+      if (j < 0) j = 0;
+      const t = list[j];
+      this.setState((st) => ({ active: j, opened: t ? { ...st.opened, [t.name]: true } : st.opened }), () => this.center(j, "auto"));
+    });
   }
 
   select(i) {
@@ -758,14 +706,14 @@ class Component extends DCLogic {
           color: this.state.tags.includes(g) ? rgb(th.ink) : rgb(th.mid),
           onClick: (e) => {
             e.stopPropagation();
-            this.toggleF("tags", g);
+            this.toggleF("tags", g, t.name);
           },
         })),
         num: t.num,
         catList: t.cats.map((c) => ({
           label: c,
           line: this.state.cats.includes(c) ? rgb(th.ink) : "transparent",
-          onClick: (e) => { e.stopPropagation(); this.toggleF("cats", c); },
+          onClick: (e) => { e.stopPropagation(); this.toggleF("cats", c, t.name); },
         })),
         open,
         expanded,
@@ -820,7 +768,7 @@ class Component extends DCLogic {
       onHome: () => this.setState({ deep: false, hdrHide: false, more: null, cats: [], tags: [], query: "", search: false, hover: null, active: 0 }, () => this.center(0)),
       rootPadX: this.state.mobile ? "12px" : "clamp(20px,3.5vw,50px)",
       rootPad: this.state.deep ? "0 clamp(20px,3.5vw,50px)" : "clamp(20px,3.5vw,50px)",
-      hdrPad: this.state.deep ? "14px 10px" : "10px",
+      hdrPad: this.state.deep ? "14px 0px" : "10px 0px",
       hdrMb: this.state.deep && !this.state.mobile ? "-64px" : "0px",
       hdrT: this.state.deep && this.state.mobile ? "translateY(-120%)" : "translateY(0)",
       hdrO: this.state.deep && this.state.mobile ? 0 : 1,
@@ -828,6 +776,7 @@ class Component extends DCLogic {
       hdrLR: this.state.deep && this.state.mobile ? "12px" : "auto",
       hdrBg: this.state.deep ? "transparent" : "linear-gradient(180deg, rgba(" + th.paper + ",1) 0%, rgba(" + th.paper + ",1) 55%, rgba(" + th.paper + ",0) 100%)",
       hdrPE: this.state.deep ? "none" : "auto",
+      idxMb: this.state.showTop ? "clamp(44px,5vw,64px)" : "0px",
       topO: this.state.showTop ? 1 : 0,
       topT: this.state.showTop ? "translateY(0)" : "translateY(12px)",
       topPE: this.state.showTop ? "auto" : "none",
